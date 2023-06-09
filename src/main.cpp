@@ -2,14 +2,45 @@
 #include <iostream>
 #include "train.h"
 
-int main() {
-  Train train;
-  int count = 60; // кол-во вагонов
+Train::Train() {
+  operationCount = 0;
+  firstCage = nullptr;
+}
 
-  while (count--)
-    train.addCage(false);
+void Train::addCage(bool isLightOn) {
+  Cage* newCage = new Cage();
+  newCage->isLightOn = isLightOn;
+  if (firstCage == nullptr) {
+    firstCage = newCage;
+    firstCage->next = newCage;
+    firstCage->prev = newCage;
+  } else {
+    newCage->next = firstCage;
+    newCage->prev = firstCage->prev;
+    (firstCage->prev)->next = newCage;
+    firstCage->prev = newCage;
+  }
+}
 
-  std::cout << train.getLength() << std::endl;
-  std::cout << train.getOpCount() << std::endl;
-  return 0;
+int Train::getLength() {
+  int length = 0;
+  firstCage->isLightOn = true;
+  while (firstCage->isLightOn) {
+    length = 0;
+    Cage* currentCage = firstCage->next;
+    operationCount++;
+    length++;
+    while (!currentCage->isLightOn) {
+      operationCount++;
+      length++;
+      currentCage = currentCage->next;
+    }
+    currentCage->isLightOn = false;
+  }
+  operationCount *= 2;
+  return length;
+}
+
+int Train::getOperationCount() {
+  return operationCount;
 }
