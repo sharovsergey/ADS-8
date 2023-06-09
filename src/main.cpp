@@ -1,27 +1,45 @@
 // Copyright 2022 NNTU-CS
-#include 
+#include "train.h"
 
-using namespace std;
+Train::Train() {
+  operationCount = 0;
+  firstCage = nullptr;
+}
 
-int main() {
-  int n, count = 1;
-  bool light;
-  cout << "Введите количество вагонов: ";
-  cin >> n;
-  cout << "Включить свет в первом вагоне? (1 - да, 0 - нет)\n";
-  cin >> light;
-  bool prevLight = light;
-  for (int i = 2; i <= n; i++) {
-    cout << "Включить свет в " << i << " вагоне? (1 - да, 0 - нет)\n";
-    cin >> light;
-    if (prevLight != light) {
-      count++;
-      prevLight = light;
+void Train::addCage(bool isLightOn) {
+  Cage* newCage = new Cage();
+  newCage->isLightOn = isLightOn;
+  if (firstCage == nullptr) {
+    firstCage = newCage;
+    firstCage->next = newCage;
+    firstCage->prev = newCage;
+  } else {
+    newCage->next = firstCage;
+    newCage->prev = firstCage->prev;
+    (firstCage->prev)->next = newCage;
+    firstCage->prev = newCage;
+  }
+}
+
+int Train::getLength() {
+  int length = 0;
+  firstCage->isLightOn = true;
+  while (firstCage->isLightOn) {
+    length = 0;
+    Cage* currentCage = firstCage->next;
+    operationCount++;
+    length++;
+    while (!currentCage->isLightOn) {
+      operationCount++;
+      length++;
+      currentCage = currentCage->next;
     }
+    currentCage->isLightOn = false;
   }
-  if (prevLight != light) {
-    count++;
-  }
-  cout << "Общее количество вагонов: " << count << endl;
-  return 0;
+  operationCount *= 2;
+  return length;
+}
+
+int Train::getOperationCount() {
+  return operationCount;
 }
